@@ -1,7 +1,8 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { APP_COLOR_THEME_KEY_NAME } from '../utils/constants'
 
 export function ThemeSwitcherButton() {
-  const [theme, setTheme] = useLocalStorage('color-theme')
+  const [theme, setTheme] = useLocalStorage(APP_COLOR_THEME_KEY_NAME)
 
   function toggleDarkMode() {
     if (theme) {

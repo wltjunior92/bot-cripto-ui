@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useEffect } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { APP_COLOR_THEME_KEY_NAME } from '../utils/constants'
 
 type ThemeContextDataProps = {}
 
@@ -12,7 +13,7 @@ export const ThemeContext = createContext<ThemeContextDataProps>(
 )
 
 export function ThemeContextProvider({ children }: ThemeContextProviderProps) {
-  const [theme, setTheme] = useLocalStorage('color-theme', 'dark')
+  const [theme, setTheme] = useLocalStorage(APP_COLOR_THEME_KEY_NAME, 'dark')
 
   useEffect(() => {
     if (theme === 'light') {

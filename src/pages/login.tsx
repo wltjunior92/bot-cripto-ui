@@ -10,10 +10,14 @@ import { ThemeSwitcherButton } from '../components/ThemeSwitcherButton'
 import { loginFormValidationSchema } from '../utils/schemaValidations'
 import { handleLoginService } from '../services/AuthService'
 import { useNavigate } from 'react-router-dom'
+import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
+import { AxiosErrorDefault } from 'axios'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 
 type LoginFormData = zod.infer<typeof loginFormValidationSchema>
 
 export function Login() {
+  const [, setJwtToken] = useLocalStorage(JWT_TOKEN_KEY_NAME)
   const {
     register,
     handleSubmit,
@@ -24,13 +28,21 @@ export function Login() {
 
   const navigate = useNavigate()
 
-  function handleLogin(data: LoginFormData) {
-    const result = handleLoginService(data)
-    console.log(result)
-    if (result) {
-      navigate('/settings')
-    } else {
-      toast.error('Erro ao fazer login', {
+  async function handleLogin(data: LoginFormData) {
+    try {
+      const token = await handleLoginService(data)
+
+      if (token) {
+        console.log(token)
+        setJwtToken(token)
+        navigate('/settings')
+      }
+    } catch (error) {
+      const err = error as AxiosErrorDefault
+
+      const message =
+        err.response?.data.message || 'Não foi possível fazer login.'
+      toast.error(message, {
         position: 'top-right',
       })
     }

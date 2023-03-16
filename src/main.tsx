@@ -12,8 +12,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ThemeContextProvider>
       <BrowserRouter>
-        <Router />
         <Toaster />
+        <Router />
       </BrowserRouter>
     </ThemeContextProvider>
   </React.StrictMode>,
