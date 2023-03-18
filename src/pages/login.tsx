@@ -13,11 +13,14 @@ import { useNavigate } from 'react-router-dom'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 import { AxiosErrorDefault } from 'axios'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { Logo } from '../components/Logo'
+import { useAuth } from '../hooks/useAuth'
 
 type LoginFormData = zod.infer<typeof loginFormValidationSchema>
 
 export function Login() {
   const [, setJwtToken] = useLocalStorage(JWT_TOKEN_KEY_NAME)
+  const { handleGetUserData } = useAuth()
   const {
     register,
     handleSubmit,
@@ -33,9 +36,9 @@ export function Login() {
       const token = await handleLoginService(data)
 
       if (token) {
-        console.log(token)
         setJwtToken(token)
-        navigate('/settings')
+        handleGetUserData(token)
+        navigate('/dashboard')
       }
     } catch (error) {
       const err = error as AxiosErrorDefault
@@ -54,18 +57,8 @@ export function Login() {
         <ThemeSwitcherButton />
       </div>
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <a
-          href="#"
-          className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
-        >
-          <img
-            className="w-8 h-8 mr-2"
-            src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
-            alt="logo"
-          />
-          Bot Cripto
-        </a>
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <Logo />
+        <div className="w-full bg-white rounded-lg shadow dark:border mt-6 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Acesse sua conta

@@ -23,5 +23,14 @@ export function useLocalStorage(key: string, initialValue = '') {
     [key],
   )
 
-  return [state, setValue]
+  const removeValue = useCallback(() => {
+    try {
+      setState('')
+      localStorage.removeItem(key)
+    } catch (error) {
+      console.log(error)
+    }
+  }, [key])
+
+  return [state, setValue, removeValue]
 }

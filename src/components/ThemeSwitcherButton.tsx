@@ -33,7 +33,7 @@ export function ThemeSwitcherButton() {
       {theme === 'light' ? (
         <svg
           id="theme-toggle-dark-icon"
-          className="w-5 h-5"
+          className="w-4 h-4"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -43,7 +43,7 @@ export function ThemeSwitcherButton() {
       ) : (
         <svg
           id="theme-toggle-light-icon"
-          className="w-5 h-5"
+          className="w-4 h-4"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
