@@ -6,6 +6,7 @@ declare module 'axios' {
       data: {
         message: string
       }
+      status: number
     }
   }
 }

@@ -5,22 +5,23 @@ import {
 
 type ButtonProps = FlowbiteButtonProps & {
   variant?: 'primary' | 'secondary' | 'danger'
+  customWidth?: string
 }
 
 export function Button({
   variant = 'primary',
+  customWidth,
   children,
   ...rest
 }: ButtonProps) {
   return (
     <FlowbiteButton
       className={`
-        w-full
         text-white
         ${
           variant === 'primary'
             ? `
-          bg-primary-500
+          bg-primary-600
           hover:bg-primary-700
           focus:ring-primary-300
           dark:bg-primary-600
@@ -29,7 +30,7 @@ export function Button({
         `
             : variant === 'secondary'
             ? `
-          bg-blue-500
+          bg-blue-600
           hover:bg-blue-700
           focus:ring-blue-300
           dark:bg-blue-600
@@ -37,7 +38,7 @@ export function Button({
           dark:focus:ring-blue-800
         `
             : `
-          bg-red-500
+          bg-red-600
           hover:bg-red-700
           focus:ring-red-300
           dark:bg-red-600
@@ -52,6 +53,7 @@ export function Button({
         text-sm
         px-5
         text-center
+        ${!customWidth ? 'w-full' : customWidth}
       `}
       {...rest}
     >

@@ -14,3 +14,26 @@ body {
 body::-webkit-scrollbar {
   display: none;
 }
+
+
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  position: relative
+}
+
+.control-react-select {
+  border: 0 !important;
+  border-radius: 6px !important;
+  overflow: visible;
+}
+
+.input-react-select:focus {
+  border: 0 !important;
+}
+
+.input-react-select {
+  border: 0 !important;
+}

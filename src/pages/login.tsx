@@ -70,6 +70,7 @@ export function Login() {
               <Input
                 id="email"
                 label="Seu email"
+                placeholder="name@email.com"
                 error={errors.email as any}
                 {...register('email')}
               />

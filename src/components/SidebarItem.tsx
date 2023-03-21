@@ -14,7 +14,7 @@ export function SidebarItem({ children, icon, link }: SidebarItemProps) {
     <li>
       <Link
         to={link}
-        className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+        className="flex items-center p-2 text-base font-normal text-gray-50 rounded-lg hover:text-gray-50 hover:bg-gray-500 dark:hover:bg-gray-700 dark:hover:text-gray-50"
         onClick={() => handleSetIsOpen(false)}
       >
         <>
