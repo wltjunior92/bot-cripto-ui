@@ -1,12 +1,14 @@
-import { Avatar } from 'flowbite-react'
 import { useState } from 'react'
+
+import { Avatar } from 'flowbite-react'
+
+import { DropdownItem } from './DropdownItem'
+import { Logo } from './Logo'
+import { ThemeSwitcherButton } from './ThemeSwitcherButton'
 import { useAuth } from '../hooks/useAuth'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useNavBar } from '../hooks/useNavBar'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
-import { DropdownItem } from './DropdownItem'
-import { Logo } from './Logo'
-import { ThemeSwitcherButton } from './ThemeSwitcherButton'
 
 export function NavBar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)

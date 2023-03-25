@@ -2,6 +2,9 @@ import { z } from 'zod'
 
 const envSchema = z.object({
   VITE_APP_API: z.string(),
+  VITE_APP_WS: z.string(),
+  VITE_APP_BWS_URL: z.string(),
+  MODE: z.string(),
 })
 
 const _env = envSchema.safeParse(import.meta.env)

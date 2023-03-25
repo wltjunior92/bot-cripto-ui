@@ -19,6 +19,7 @@ export const settingsFormValidationSchema = zod
     password: zod.string(),
     passwordConfirmation: zod.string(),
     apiUrl: zod.string(),
+    streamUrl: zod.string(),
     accessKey: zod.string(),
     secretKey: zod.string(),
   })

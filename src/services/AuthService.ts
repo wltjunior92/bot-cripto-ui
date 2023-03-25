@@ -1,4 +1,5 @@
 import axios from 'axios'
+
 import { env } from '../env'
 
 type HandleLoginProps = {
@@ -17,6 +18,12 @@ export async function handleLoginService({
     email,
     password,
   })
+
+  return data.token
+}
+
+export async function refreshToken() {
+  const { data } = await axios.patch(`${API_URL}/token/refresh`)
 
   return data.token
 }

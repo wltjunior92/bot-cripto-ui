@@ -1,4 +1,5 @@
 import axios, { AxiosErrorDefault } from 'axios'
+
 import { UserDTO } from '../dtos/userDTO'
 import { env } from '../env'
 

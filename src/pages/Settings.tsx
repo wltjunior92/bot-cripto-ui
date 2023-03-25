@@ -1,22 +1,23 @@
 import { useMemo } from 'react'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as zod from 'zod'
 
 import { Button } from '../components/Button'
 import { Input } from '../components/Input'
-import { useAuth } from '../hooks/useAuth'
-import { settingsFormValidationSchema } from '../utils/schemaValidations'
+import { Symbols } from '../components/Symbols'
 import { UserDTO } from '../dtos/userDTO'
-import { updateUserData } from '../services/UserDataService'
+import { useAuth } from '../hooks/useAuth'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { updateUserData } from '../services/UserDataService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 import { requestNotificationHandler } from '../utils/requestNotificationHandler'
-import { Symbols } from '../components/Symbols'
+import { settingsFormValidationSchema } from '../utils/schemaValidations'
 
 type SettingsFormData = zod.infer<typeof settingsFormValidationSchema>
 
-export function Settings() {
+export default function Settings() {
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
   const { user, setUserAction } = useAuth()
   const {
@@ -31,6 +32,7 @@ export function Settings() {
         email: user?.email,
         name: user?.name,
         apiUrl: user?.apiUrl,
+        streamUrl: user?.streamUrl,
         accessKey: user?.accessKey,
       }
     }, [user]),
@@ -42,6 +44,7 @@ export function Settings() {
       name: data.name,
       password: data.password || null,
       apiUrl: data.apiUrl,
+      streamUrl: data.streamUrl,
       accessKey: data.accessKey,
       secretKey: data.secretKey || null,
     }
@@ -118,6 +121,14 @@ export function Settings() {
                 label="API URL"
                 placeholder="Digite a url da api da Binance a ser utilizada"
                 {...register('apiUrl')}
+              />
+            </div>
+            <div className="col-span-1 md:col-span-12">
+              <Input
+                id="streamUrl"
+                label="STREAM URL"
+                placeholder="Digite a url da stream de dados da Binance a ser utilizada"
+                {...register('streamUrl')}
               />
             </div>
             <div className="col-span-1 md:col-span-12">

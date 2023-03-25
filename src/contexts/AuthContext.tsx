@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useEffect, useState } from 'react'
+
 import { UserDTO } from '../dtos/userDTO'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { getUserData } from '../services/UserDataService'

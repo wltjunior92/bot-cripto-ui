@@ -50,7 +50,6 @@ export function Button({
         focus:outline-none
         font-medium
         rounded-lg
-        text-sm
         px-5
         text-center
         ${!customWidth ? 'w-full' : customWidth}

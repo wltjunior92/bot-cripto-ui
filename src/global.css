@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-50 dark:bg-gray-900
+  @apply bg-gray-100 dark:bg-gray-900
 }
 
 body {
@@ -30,10 +30,56 @@ body {
   overflow: visible;
 }
 
+.control-react-select-symbol {
+  border: 0 !important;
+  border-radius: 0 6px 6px 0 !important;
+  overflow: visible;
+}
+
 .input-react-select:focus {
   border: 0 !important;
 }
 
+.input-react-select input:focus {
+  box-shadow: 0 0 0 0 !important;
+  border: 0 none !important;
+  outline: 0 !important;
+}
+
 .input-react-select {
   border: 0 !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.candle-chart {
+  @apply col-span-1 md:col-span-12 mt-4 w-screen md:w-full -translate-x-4 md:translate-x-0 bg-white border-0 md:border border-gray-200 rounded-none md:rounded-2xl shadow dark:bg-gray-800 dark:border-gray-700 overflow-hidden h-[750px] md:h-[650px]
+}
+
+.alert-text {
+  max-width: 100%;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+@media (min-width: 768px) {
+  /* width */
+  ::-webkit-scrollbar {
+    width: 7px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    border: 1px solid rgba(130, 134, 140, 0.2);
+    background: rgba(106, 116, 130, 0.1);
+    border-radius: 10px;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgba(106, 116, 130, 1);
+    border-radius: 10px;
+  }
 }

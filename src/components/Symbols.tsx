@@ -1,13 +1,20 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+
+import { Button } from './Button'
+import { CheckboxInput } from './CheckboxInput'
 import { SymbolDTO } from '../dtos/userDTO'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { getSymbols, syncSymbols } from '../services/SymbolsService'
+import {
+  getSymbols,
+  syncSymbols,
+  updateFavoriteSymbol,
+} from '../services/SymbolsService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 import { requestNotificationHandler } from '../utils/requestNotificationHandler'
-import { Button } from './Button'
 
 export function Symbols() {
   const [isSyncing, setIsSyncing] = useState(false)
+  const [isOnlyFavorites, setIsOnlyFavorites] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [symbols, setSymbols] = useState<SymbolDTO[]>([])
   const [filteredSymbols, setFilteredSymbols] = useState<SymbolDTO[]>([])
@@ -39,11 +46,34 @@ export function Symbols() {
     }
   }
 
+  async function handleFavoriteSymbol(symbol: string, value: boolean) {
+    const result = await updateFavoriteSymbol(token, symbol, value)
+
+    if (!result.success) {
+      return requestNotificationHandler(result)
+    }
+
+    const symbolIndex = symbols.findIndex((s) => s.symbol === symbol)
+    const cloneList = [...symbols]
+    cloneList[symbolIndex] = result.data
+
+    setSymbols(cloneList)
+    requestNotificationHandler(result)
+  }
+
   function handleSearch(e: FormEvent) {
     e.preventDefault()
     const eventTarget = e.target as any
 
     setSearchTerm(eventTarget.simple_search.value)
+  }
+
+  function handleFilterFavorites(e: ChangeEvent) {
+    e.preventDefault()
+    const eventTarget = e.target as any
+    const isOnlyFavoritesSelected = eventTarget.checked
+
+    setIsOnlyFavorites(isOnlyFavoritesSelected)
   }
 
   useEffect(() => {
@@ -62,6 +92,15 @@ export function Symbols() {
       setFilteredSymbols(filteredList)
     }
   }, [searchTerm, symbols])
+
+  useEffect(() => {
+    if (!isOnlyFavorites) {
+      setFilteredSymbols(symbols)
+    } else {
+      const filteredList = symbols.filter((s) => s.is_favorite)
+      setFilteredSymbols(filteredList)
+    }
+  }, [isOnlyFavorites, symbols])
 
   return (
     <div className="col-span-1 md:col-span-12 mt-4 w-full py-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -100,6 +139,14 @@ export function Symbols() {
                 />
               </div>
             </form>
+          </div>
+          <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+            <CheckboxInput
+              id="onlyFavorites"
+              label="Apenas favoritos"
+              onChange={handleFilterFavorites}
+              checked={isOnlyFavorites}
+            />
           </div>
           <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
             <Button
@@ -147,8 +194,35 @@ export function Symbols() {
                     scope="row"
                     className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                   >
-                    {symbol.symbol}
-                    {symbol.is_favorite && '⭐'}
+                    <div className="flex flex-row items-center ">
+                      {symbol.symbol}
+                      <div
+                        title="Favoritar par"
+                        className="ml-2 cursor-pointer"
+                      >
+                        <svg
+                          fill={symbol.is_favorite ? '#f7d309' : 'none'}
+                          stroke="currentColor"
+                          strokeWidth={1.5}
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                          className="w-5 h-5"
+                          onClick={() =>
+                            handleFavoriteSymbol(
+                              symbol.symbol,
+                              !symbol.is_favorite,
+                            )
+                          }
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
                   </th>
                   <td className="px-4 py-3">{symbol.base_precision}</td>
                   <td className="px-4 py-3">{symbol.quote_precision}</td>

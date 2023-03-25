@@ -1,11 +1,16 @@
-import { forwardRef, useState } from 'react'
+import { forwardRef } from 'react'
+
 import { Label } from 'flowbite-react'
 import Select from 'react-select'
+
+import { useEnums } from '../hooks/useEnums'
+import { ReactSelectProps } from '../interfaces/ReactSelectProps'
 
 type SelectQuoteProps = {
   id: string
   label?: string
-  data: any[]
+  onChange: (value: any) => void
+  value?: ReactSelectProps
   error?:
     | {
         message: string
@@ -14,12 +19,8 @@ type SelectQuoteProps = {
 }
 
 export const SelectQuote = forwardRef<any, SelectQuoteProps>(
-  function SelectQuote({ id, data, label }, ref) {
-    const [animal, setAnimal] = useState(null)
-    const handleChange = (value: any) => {
-      console.log('value:', value)
-      setAnimal(value)
-    }
+  function SelectQuote({ id, label, onChange, value }, ref) {
+    const { quotes } = useEnums()
 
     return (
       <div className="flex flex-col">
@@ -34,11 +35,11 @@ export const SelectQuote = forwardRef<any, SelectQuoteProps>(
           ref={ref}
           id={id}
           isSearchable
-          isClearable
           placeholder="Selecione um Par"
-          value={animal}
-          onChange={handleChange}
-          options={data}
+          defaultValue={value}
+          onChange={onChange}
+          value={value}
+          options={quotes}
           menuPortalTarget={document.body}
           menuPosition={'fixed'}
           styles={{
