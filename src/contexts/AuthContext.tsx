@@ -10,6 +10,8 @@ type AuthContextDataProps = {
   clearUser: () => void
   handleGetUserData: (token: string) => Promise<void>
   setUserAction: (user: UserDTO) => void
+  setIsLoggedInAction: (value: boolean) => void
+  isLoggedIn: boolean
 }
 
 type AuthContextProviderProps = {
@@ -22,6 +24,7 @@ export const AuthContext = createContext<AuthContextDataProps>(
 
 export function AuthProvider({ children }: AuthContextProviderProps) {
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [user, setUser] = useState<UserDTO | null>(null)
 
   function clearUser() {
@@ -40,6 +43,11 @@ export function AuthProvider({ children }: AuthContextProviderProps) {
       setUser(null)
     }
   }
+
+  function setIsLoggedInAction(value: boolean) {
+    setIsLoggedIn(value)
+  }
+
   useEffect(() => {
     const path = window.location.pathname
     if (path !== '/') {
@@ -49,7 +57,14 @@ export function AuthProvider({ children }: AuthContextProviderProps) {
 
   return (
     <AuthContext.Provider
-      value={{ user, clearUser, handleGetUserData, setUserAction }}
+      value={{
+        user,
+        clearUser,
+        handleGetUserData,
+        setUserAction,
+        setIsLoggedInAction,
+        isLoggedIn,
+      }}
     >
       {children}
     </AuthContext.Provider>

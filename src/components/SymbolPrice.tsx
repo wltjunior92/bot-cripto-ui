@@ -1,20 +1,21 @@
 import { useState } from 'react'
 
-import { Label } from 'flowbite-react'
 import useWebSocket from 'react-use-websocket'
 
 import { env } from '../env'
 import { JsonMessageProps } from '../interfaces/JsonMessageProps'
 
 type SymbolPriceProps = {
-  symbol: string
+  symbol?: string
 }
 
 export function SymbolPrice({ symbol }: SymbolPriceProps) {
   const [book, setBook] = useState({ bid: '0', ask: '0' })
 
   function getBinanceWSUrl() {
-    return `${env.VITE_APP_BWS_URL}/${symbol.toLowerCase()}@bookTicker`
+    return `${env.VITE_APP_BWS_URL}/${
+      symbol ? symbol.toLowerCase() : ''
+    }@bookTicker`
   }
 
   const { lastJsonMessage, sendJsonMessage } = useWebSocket(getBinanceWSUrl(), {
@@ -46,16 +47,33 @@ export function SymbolPrice({ symbol }: SymbolPriceProps) {
   })
 
   return (
-    <div>
-      <Label
-        htmlFor="book"
-        value="Preço"
-        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-      />
-      <div id="book">
-        BID: {book.bid}
-        <br />
-        ASK: {book.ask}
+    <div className="ml-auto w-full md:w-fit flex flex-row flex-1">
+      <div className="flex justify-center mr-4">
+        <span className="text-white font-bold">
+          Spread {symbol || '-------'}:
+        </span>
+      </div>
+      <div className="border w-full md:w-[150px] rounded-lg dark:border-gray-600 border-white dark:bg-gray-900 bg-gray-700 shadow-inner dark:shadow-black shadow-gray-800 overflow-hidden">
+        <div className="flex flex-row border-b dark:border-gray-600 border-gray-400">
+          <div className="bg-red-800 p-2 w-11">
+            <span className="text-white font-mono">BID</span>
+          </div>
+          <div className="p-2">
+            <span className="text-gray-100 font-mono">
+              {`${book.bid || '0'}`.substring(0, 9)}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-row">
+          <div className="bg-green-800 p-2 w-11">
+            <span className="text-white font-mono">ASK</span>
+          </div>
+          <div className="p-2">
+            <span className="text-gray-100 font-mono">
+              {`${book.ask || '0'}`.substring(0, 9)}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   )

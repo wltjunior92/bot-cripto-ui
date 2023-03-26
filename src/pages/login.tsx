@@ -1,26 +1,26 @@
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as zod from 'zod'
+import { AxiosErrorDefault } from 'axios'
+import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
+import * as zod from 'zod'
 
 import { Button } from '../components/Button'
 import { CheckboxInput } from '../components/CheckboxInput'
 import { Input } from '../components/Input'
-import { ThemeSwitcherButton } from '../components/ThemeSwitcherButton'
-import { loginFormValidationSchema } from '../utils/schemaValidations'
-import { handleLoginService } from '../services/AuthService'
-import { useNavigate } from 'react-router-dom'
-import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
-import { AxiosErrorDefault } from 'axios'
-import { useLocalStorage } from '../hooks/useLocalStorage'
 import { Logo } from '../components/Logo'
+import { ThemeSwitcherButton } from '../components/ThemeSwitcherButton'
 import { useAuth } from '../hooks/useAuth'
+import { useLocalStorage } from '../hooks/useLocalStorage'
+import { handleLoginService } from '../services/AuthService'
+import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
+import { loginFormValidationSchema } from '../utils/schemaValidations'
 
 type LoginFormData = zod.infer<typeof loginFormValidationSchema>
 
 export function Login() {
   const [, setJwtToken] = useLocalStorage(JWT_TOKEN_KEY_NAME)
-  const { handleGetUserData } = useAuth()
+  const { handleGetUserData, setIsLoggedInAction } = useAuth()
   const {
     register,
     handleSubmit,
@@ -38,6 +38,7 @@ export function Login() {
       if (token) {
         setJwtToken(token)
         handleGetUserData(token)
+        setIsLoggedInAction(true)
         navigate('/dashboard')
       }
     } catch (error) {

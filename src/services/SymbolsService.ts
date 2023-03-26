@@ -28,6 +28,29 @@ export async function getSymbols(token: string) {
   }
 }
 
+export async function getSymbol(token: string, symbol: string) {
+  try {
+    if (!symbol) return { success: false }
+    const { data } = await axios.get(`${API_URL}/symbol/${symbol}`, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    })
+
+    return {
+      data,
+      success: true,
+    }
+  } catch (error) {
+    const err = error as AxiosErrorDefault
+    return {
+      success: false,
+      message: 'Não foi possível carregar o par selecionado',
+      errorCode: err.response?.status,
+    } as RequestNotificationHandlerProps
+  }
+}
+
 export async function syncSymbols(token: string) {
   try {
     await axios.post(

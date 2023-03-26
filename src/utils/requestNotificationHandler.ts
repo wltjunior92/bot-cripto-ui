@@ -13,6 +13,7 @@ export type RequestNotificationHandlerProps = {
 
 export async function requestNotificationHandler(
   result: RequestNotificationHandlerProps,
+  logoutCb?: (value: boolean) => void,
 ) {
   if (result.message) {
     if (result.success) {
@@ -22,6 +23,9 @@ export async function requestNotificationHandler(
     } else {
       if (result.errorCode === 401) {
         handleUnauthorized()
+        if (logoutCb) {
+          logoutCb(false)
+        }
       }
       toast.error(result.message, {
         position: 'top-right',
@@ -30,11 +34,14 @@ export async function requestNotificationHandler(
   } else {
     if (result.errorCode === 401) {
       handleUnauthorized()
+      if (logoutCb) {
+        logoutCb(false)
+      }
     }
   }
 }
 
-async function handleUnauthorized() {
+export async function handleUnauthorized() {
   if (env.MODE === 'development') {
     localStorage.removeItem(JWT_TOKEN_KEY_NAME)
     return window.location.reload()

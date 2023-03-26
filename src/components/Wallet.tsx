@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { UserBalanceDTO } from '../dtos/userBalaceDTO'
+import { useAuth } from '../hooks/useAuth'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { getBalance } from '../services/ExchangeService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
@@ -20,11 +21,13 @@ export function Wallet({ data }: WalletProps) {
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
   const [balance, setBalance] = useState<Balance[]>([])
 
+  const { setIsLoggedInAction } = useAuth()
+
   const fetchBalance = useCallback(async () => {
     const result = await getBalance(token)
 
     if (!result.success) {
-      requestNotificationHandler(result)
+      requestNotificationHandler(result, setIsLoggedInAction)
     }
 
     const parsedBalance = result.data ? parseBallanceData(result.data) : []

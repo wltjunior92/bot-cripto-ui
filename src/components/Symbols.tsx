@@ -3,6 +3,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { Button } from './Button'
 import { CheckboxInput } from './CheckboxInput'
 import { SymbolDTO } from '../dtos/userDTO'
+import { useAuth } from '../hooks/useAuth'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import {
   getSymbols,
@@ -20,11 +21,13 @@ export function Symbols() {
   const [filteredSymbols, setFilteredSymbols] = useState<SymbolDTO[]>([])
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
 
+  const { setIsLoggedInAction } = useAuth()
+
   async function fetchSymbols() {
     const result = await getSymbols(token)
 
     if (!result.success) {
-      return requestNotificationHandler(result)
+      return requestNotificationHandler(result, setIsLoggedInAction)
     }
 
     setSymbols(result.data)
@@ -37,7 +40,7 @@ export function Symbols() {
       const result = await syncSymbols(token)
 
       if (!result.success) {
-        return requestNotificationHandler(result)
+        return requestNotificationHandler(result, setIsLoggedInAction)
       }
 
       requestNotificationHandler(result)
@@ -50,7 +53,7 @@ export function Symbols() {
     const result = await updateFavoriteSymbol(token, symbol, value)
 
     if (!result.success) {
-      return requestNotificationHandler(result)
+      return requestNotificationHandler(result, setIsLoggedInAction)
     }
 
     const symbolIndex = symbols.findIndex((s) => s.symbol === symbol)

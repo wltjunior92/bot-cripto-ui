@@ -13,12 +13,14 @@ import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 export function NavBar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const { handleSetIsOpen, isOpen } = useNavBar()
+  const { setIsLoggedInAction } = useAuth()
   const { user } = useAuth()
   const [, , removeToken] = useLocalStorage(JWT_TOKEN_KEY_NAME)
 
   function handleLogout() {
     removeToken()
     setIsDropdownOpen(false)
+    setIsLoggedInAction(false)
     window.location.reload()
   }
 

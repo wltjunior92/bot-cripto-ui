@@ -1,11 +1,6 @@
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react'
+import { createContext, ReactNode, useEffect, useState } from 'react'
 
+import { useAuth } from '../hooks/useAuth'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { ReactSelectProps } from '../interfaces/ReactSelectProps'
 import { getQuotes, getSymbols } from '../services/SymbolsService'
@@ -31,12 +26,13 @@ export const EnumsDataContext = createContext<EnumsDataContextDataProps>(
 )
 
 export function EnumsDataProvider({ children }: EnumsDataContextProviderProps) {
+  const { isLoggedIn } = useAuth()
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
   const [isLoading, setIsLoading] = useState(true)
   const [quotes, setQuotes] = useState<ReactSelectProps[]>([])
   const [symbols, setSymbols] = useState<SymbolsProps[]>([])
 
-  const fetchSymbols = useCallback(async () => {
+  const fetchSymbols = async () => {
     const result = await getSymbols(token)
 
     if (result.success) {
@@ -48,17 +44,18 @@ export function EnumsDataProvider({ children }: EnumsDataContextProviderProps) {
       )
       setSymbols(symbolsNames)
     }
-  }, [token])
+  }
 
-  const fetchQuotes = useCallback(async () => {
+  const fetchQuotes = async () => {
     const result = await getQuotes(token)
 
     if (result.success) {
       setQuotes(result.data)
     }
-  }, [token])
+  }
 
   useEffect(() => {
+    console.log(window.location.pathname)
     const path = window.location.pathname
     if (path !== '/') {
       setIsLoading(true)
@@ -69,7 +66,7 @@ export function EnumsDataProvider({ children }: EnumsDataContextProviderProps) {
         setIsLoading(false)
       }
     }
-  }, [token])
+  }, [isLoggedIn, window.location.pathname])
 
   return (
     <EnumsDataContext.Provider value={{ quotes, symbols, isLoading }}>

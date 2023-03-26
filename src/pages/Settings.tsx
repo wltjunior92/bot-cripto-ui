@@ -38,6 +38,8 @@ export default function Settings() {
     }, [user]),
   })
 
+  const { setIsLoggedInAction } = useAuth()
+
   async function handleSubmitSettings(data: SettingsFormData) {
     const user: UserDTO & { password: string | null } = {
       email: data.email,
@@ -51,13 +53,14 @@ export default function Settings() {
 
     const result = await updateUserData(user, token)
 
-    if (result.success) {
-      setValue('password', '')
-      setValue('passwordConfirmation', '')
-      setValue('secretKey', '')
-      if (result.data) {
-        setUserAction(result.data)
-      }
+    if (!result.success) {
+      return requestNotificationHandler(result, setIsLoggedInAction)
+    }
+    setValue('password', '')
+    setValue('passwordConfirmation', '')
+    setValue('secretKey', '')
+    if (result.data) {
+      setUserAction(result.data)
     }
 
     requestNotificationHandler(result)

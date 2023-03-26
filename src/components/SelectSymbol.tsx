@@ -10,7 +10,7 @@ type SelectSymbolProps = ReactSelectLibProps & {
   id: string
   label?: string
   isOnlyFavorites?: boolean
-  value?: ReactSelectProps
+  value?: ReactSelectProps | null
   disabled?: boolean
   error?:
     | {
