@@ -5,11 +5,12 @@ import { RiAlertFill } from 'react-icons/ri'
 
 import { Button } from '../components/Button'
 import { FeedbackAlert } from '../components/FeedbackAlert'
+import { SelectSide } from '../components/SelectSide'
 import { SelectSymbol } from '../components/SelectSymbol'
 import { SymbolPrice } from '../components/SymbolPrice'
+import { WalletSummary } from '../components/WalletSummary'
 import { useAuth } from '../hooks/useAuth'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { useWallet } from '../hooks/useWallet'
 import { getSymbol } from '../services/SymbolsService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 import { requestNotificationHandler } from '../utils/requestNotificationHandler'
@@ -18,9 +19,8 @@ export default function NewOrder() {
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
   const { setIsLoggedInAction } = useAuth()
   const [selectedSymbol, setSelectedSymbol] = useState<any>({})
+  const [orderSide, setOrderSide] = useState<'buy' | 'sell'>('buy')
   const [error, setError] = useState('')
-
-  const { wallet } = useWallet()
 
   const test = {
     symbol: '',
@@ -36,28 +36,6 @@ export default function NewOrder() {
 
   function handleSubmitForm(data: any) {
     console.log(data)
-  }
-
-  function getBaseAsset() {
-    if (!wallet) return 0
-    if (!selectedSymbol) return 0
-
-    const baseAsset = wallet.find((w) => w.symbol === selectedSymbol.base_asset)
-    if (!baseAsset) return 0
-
-    return `${selectedSymbol.base_asset}: ${baseAsset.available}`
-  }
-
-  function getQuoteAsset() {
-    if (!wallet) return 0
-    if (!selectedSymbol) return 0
-
-    const quoteAsset = wallet.find(
-      (w) => w.symbol === selectedSymbol.quote_asset,
-    )
-    if (!quoteAsset) return 0
-
-    return `${selectedSymbol.quote_asset}: ${quoteAsset.available}`
   }
 
   const fetchSymbol = useCallback(async () => {
@@ -84,11 +62,11 @@ export default function NewOrder() {
           </h1>
         </div>
         <form
-          className="col-span-1 md:col-span-12 grid mt-4 w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
+          className="col-span-1 md:col-span-12 grid mt-4 gap-x-4 gap-y-2 md:gap-y-0 w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"
           onSubmit={handleSubmit(handleSubmitForm)}
           autoComplete="off"
         >
-          <div className="col-span-12 md:col-span-6 row-start-2 md:row-start-auto">
+          <div className="col-span-12 md:col-span-6 mb-4">
             <Controller
               name="symbol"
               control={control}
@@ -104,11 +82,18 @@ export default function NewOrder() {
               rules={{ required: true }}
             />
           </div>
-          <div className="col-span-12 md:col-span-6 row-start-1 md:row-start-auto">
+          <div className="col-span-12 md:col-span-6">
             <SymbolPrice symbol={symbol?.value} />
           </div>
-          <div className="col-span-1 md:col-span-6 mt-2">{getBaseAsset()}</div>
-          <div className="col-span-1 md:col-span-6 mt-2">{getQuoteAsset()}</div>
+          <div className="col-span-12 md:col-span-6 mt-2 grid grid-cols-2 gap-2">
+            <WalletSummary symbol={selectedSymbol} />
+          </div>
+          <div className="col-span-12 md:col-span-6 mt-2 grid grid-cols-2 gap-y-1">
+            <SelectSide
+              orderSide={orderSide}
+              onAction={(value) => setOrderSide(value)}
+            />
+          </div>
           <div className="col-span-12 mt-4">
             <div className="flex flex-col md:flex-row">
               {error && (

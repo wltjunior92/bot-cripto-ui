@@ -1,20 +1,17 @@
 import { createContext, ReactNode, useEffect, useState } from 'react'
 
+import { SymbolDTO } from '../dtos/userDTO'
 import { useAuth } from '../hooks/useAuth'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { ReactSelectProps } from '../interfaces/ReactSelectProps'
 import { getQuotes, getSymbols } from '../services/SymbolsService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 
-type SymbolsProps = {
-  isFavorite: boolean
-  symbol: ReactSelectProps
-}
-
 type EnumsDataContextDataProps = {
   quotes: ReactSelectProps[]
-  symbols: SymbolsProps[]
+  symbols: SymbolDTO[]
   isLoading: boolean
+  setSymbolsAction: (symbols: SymbolDTO[]) => void
 }
 
 type EnumsDataContextProviderProps = {
@@ -30,19 +27,17 @@ export function EnumsDataProvider({ children }: EnumsDataContextProviderProps) {
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
   const [isLoading, setIsLoading] = useState(true)
   const [quotes, setQuotes] = useState<ReactSelectProps[]>([])
-  const [symbols, setSymbols] = useState<SymbolsProps[]>([])
+  const [symbols, setSymbols] = useState<SymbolDTO[]>([])
+
+  function setSymbolsAction(symbols: SymbolDTO[]) {
+    setSymbols(symbols)
+  }
 
   const fetchSymbols = async () => {
     const result = await getSymbols(token)
 
     if (result.success) {
-      const symbolsNames = result.data.map(
-        (s: { symbol: string; is_favorite: boolean }) => ({
-          isFavorite: s.is_favorite,
-          symbol: { value: s.symbol, label: s.symbol },
-        }),
-      )
-      setSymbols(symbolsNames)
+      setSymbols(result.data)
     }
   }
 
@@ -69,7 +64,9 @@ export function EnumsDataProvider({ children }: EnumsDataContextProviderProps) {
   }, [isLoggedIn, window.location.pathname])
 
   return (
-    <EnumsDataContext.Provider value={{ quotes, symbols, isLoading }}>
+    <EnumsDataContext.Provider
+      value={{ quotes, symbols, isLoading, setSymbolsAction }}
+    >
       {children}
     </EnumsDataContext.Provider>
   )

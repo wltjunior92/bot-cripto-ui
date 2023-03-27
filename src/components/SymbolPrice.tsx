@@ -47,28 +47,28 @@ export function SymbolPrice({ symbol }: SymbolPriceProps) {
   })
 
   return (
-    <div className="ml-auto w-full md:w-fit flex flex-row flex-1">
-      <div className="flex justify-center mr-4">
-        <span className="text-white font-bold">
+    <div className="ml-auto w-full md:w-fit">
+      <div className="flex mr-4 mb-1">
+        <span className="text-gray-900 dark:text-white text-xs">
           Spread {symbol || '-------'}:
         </span>
       </div>
       <div className="border w-full md:w-[150px] rounded-lg dark:border-gray-600 border-white dark:bg-gray-900 bg-gray-700 shadow-inner dark:shadow-black shadow-gray-800 overflow-hidden">
         <div className="flex flex-row border-b dark:border-gray-600 border-gray-400">
-          <div className="bg-red-800 p-2 w-11">
+          <div className="bg-red-800 px-2 w-11">
             <span className="text-white font-mono">BID</span>
           </div>
-          <div className="p-2">
+          <div className="px-2">
             <span className="text-gray-100 font-mono">
               {`${book.bid || '0'}`.substring(0, 9)}
             </span>
           </div>
         </div>
         <div className="flex flex-row">
-          <div className="bg-green-800 p-2 w-11">
+          <div className="bg-green-800 px-2 w-11">
             <span className="text-white font-mono">ASK</span>
           </div>
-          <div className="p-2">
+          <div className="px-2">
             <span className="text-gray-100 font-mono">
               {`${book.ask || '0'}`.substring(0, 9)}
             </span>

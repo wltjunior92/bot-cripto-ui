@@ -34,11 +34,14 @@ export const SelectSymbol = forwardRef<any, SelectSymbolProps>(
     const filterSymbols = useCallback(() => {
       if (onlyFavorites) {
         const parsedList = symbols
-          .filter((s) => s.isFavorite)
-          .map((s) => s.symbol)
+          .filter((s) => s.is_favorite)
+          .map((s) => ({ value: s.symbol, label: s.symbol }))
         setFilteredSymbols(parsedList)
       } else {
-        const parsedList = symbols.map((s) => s.symbol)
+        const parsedList = symbols.map((s) => ({
+          value: s.symbol,
+          label: s.symbol,
+        }))
         setFilteredSymbols(parsedList)
       }
     }, [onlyFavorites, symbols])

@@ -4,6 +4,7 @@ import { Button } from './Button'
 import { CheckboxInput } from './CheckboxInput'
 import { SymbolDTO } from '../dtos/userDTO'
 import { useAuth } from '../hooks/useAuth'
+import { useEnums } from '../hooks/useEnums'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import {
   getSymbols,
@@ -22,6 +23,7 @@ export function Symbols() {
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
 
   const { setIsLoggedInAction } = useAuth()
+  const { setSymbolsAction } = useEnums()
 
   async function fetchSymbols() {
     const result = await getSymbols(token)
@@ -61,6 +63,7 @@ export function Symbols() {
     cloneList[symbolIndex] = result.data
 
     setSymbols(cloneList)
+    setSymbolsAction(cloneList)
     requestNotificationHandler(result)
   }
 
