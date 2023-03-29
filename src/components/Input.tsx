@@ -1,7 +1,5 @@
 import { forwardRef, HTMLProps } from 'react'
 
-import { Label } from 'flowbite-react'
-
 type InputProps = HTMLProps<HTMLInputElement> & {
   id: string
   label?: string
@@ -17,13 +15,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   ref,
 ) {
   return (
-    <>
+    <div className="flex flex-col">
       {!!label && (
-        <Label
+        <label
           htmlFor={id}
-          value={label}
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-        />
+          className="text-gray-900 dark:text-white font-semibold mb-2"
+        >
+          {label}
+        </label>
       )}
       <input
         className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 disabled:text-gray-700 dark:disabled:text-gray-400 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-50 dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -36,6 +35,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           {error?.message}
         </span>
       )}
-    </>
+    </div>
   )
 })

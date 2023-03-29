@@ -35,7 +35,7 @@ export const settingsFormValidationSchema = zod
     }
   })
 
-export const newOrderFormValidationSchema = zod
+export const addOrViewOrderFormValidationSchema = zod
   .object({
     symbol: zod.string().or(zod.null()),
     quantity: zod.string().nonempty('É necessário definir a quantidade.'),

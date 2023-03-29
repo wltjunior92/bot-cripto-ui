@@ -1,11 +1,15 @@
 import { AiFillEye } from 'react-icons/ai'
 import { MdCancel } from 'react-icons/md'
+import { useNavigate } from 'react-router-dom'
 
 type OrderRowProps = {
   data: any
+  onCancel: (symbol: string, orderId: string) => void
 }
 
-export function OrderRow({ data }: OrderRowProps) {
+export function OrderRow({ data, onCancel }: OrderRowProps) {
+  const navigate = useNavigate()
+
   function getDate(timestamp: string) {
     const date = new Date(parseFloat(timestamp))
     return Intl.DateTimeFormat('pt-BR', {
@@ -16,6 +20,8 @@ export function OrderRow({ data }: OrderRowProps) {
 
   function getStatusColor(status: string) {
     switch (status) {
+      case 'NEW':
+        return 'bg-gray-50'
       case 'PARTIALLY_FILLED':
         return 'bg-blue-500'
       case 'FILLED':
@@ -53,15 +59,23 @@ export function OrderRow({ data }: OrderRowProps) {
       </td>
       <td className="px-4 py-3">
         <div className="flex flex-row space-x-2 justify-end">
-          <div
-            title="Cancelar ordem"
+          {data.order_status === 'NEW' && (
+            <button
+              type="button"
+              title="Cancelar ordem"
+              onClick={() => onCancel(data.symbol, data.order_id)}
+              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md"
+            >
+              <MdCancel className="w-6 h-6 fill-red-400 transition duration-75" />
+            </button>
+          )}
+          <button
+            type="button"
             className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md"
+            onClick={() => navigate(`/orders/edit/${data.id}`)}
           >
-            <MdCancel className="w-6 h-6 fill-red-400 transition duration-75" />
-          </div>
-          <div className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md">
             <AiFillEye className="w-6 h-6 fill-gray-500 dark:fill-gray-200 transition duration-75" />
-          </div>
+          </button>
         </div>
       </td>
     </tr>

@@ -9,4 +9,6 @@ export type OrderDTO = {
     stop_price?: string
     order_type?: string
   }
+  order_id?: string
+  order_status?: string
 }

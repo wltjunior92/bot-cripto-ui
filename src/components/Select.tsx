@@ -1,7 +1,5 @@
 import { forwardRef, HTMLProps, ReactNode, useMemo } from 'react'
 
-import { Label } from 'flowbite-react'
-
 type SelectProps = HTMLProps<HTMLSelectElement> & {
   id: string
   label?: string
@@ -17,13 +15,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   function Select({ id, label, error, children, ...rest }, ref) {
     const select = useMemo(
       () => (
-        <>
+        <div className="flex flex-col">
           {!!label && (
-            <Label
+            <label
               htmlFor={id}
-              value={label}
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            />
+              className="text-gray-900 dark:text-white font-semibold mb-2"
+            >
+              {label}
+            </label>
           )}
           <select
             ref={ref}
@@ -38,7 +37,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               {error?.message}
             </span>
           )}
-        </>
+        </div>
       ),
       [error],
     )

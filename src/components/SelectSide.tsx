@@ -3,9 +3,14 @@ import { useMemo } from 'react'
 type SelectSideProps = {
   orderSide: string
   onAction: (value: 'BUY' | 'SELL') => void
+  isDisabled?: boolean
 }
 
-export function SelectSide({ orderSide, onAction }: SelectSideProps) {
+export function SelectSide({
+  orderSide,
+  onAction,
+  isDisabled = false,
+}: SelectSideProps) {
   const selectSide = useMemo(
     () => (
       <>
@@ -16,6 +21,7 @@ export function SelectSide({ orderSide, onAction }: SelectSideProps) {
         </div>
         <button
           type="button"
+          disabled={isDisabled}
           className={`
                   inline-flex
                   items-center
@@ -27,6 +33,7 @@ export function SelectSide({ orderSide, onAction }: SelectSideProps) {
                   border
                   border-r-0
                   rounded-l-lg
+                  disabled:cursor-not-allowed
                   ${
                     orderSide === 'BUY'
                       ? `
@@ -57,6 +64,7 @@ export function SelectSide({ orderSide, onAction }: SelectSideProps) {
         </button>
         <button
           type="button"
+          disabled={isDisabled}
           className={`
                   inline-flex
                   items-center
@@ -67,6 +75,7 @@ export function SelectSide({ orderSide, onAction }: SelectSideProps) {
                   font-medium
                   border
                   rounded-r-lg
+                  disabled:cursor-not-allowed
                   ${
                     orderSide === 'SELL'
                       ? `

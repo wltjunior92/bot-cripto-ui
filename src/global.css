@@ -64,6 +64,18 @@ body {
   word-break: break-all;
 }
 
+.swal2-shown {
+  padding-right: 0 !important;
+}
+
+.sweetalert-popup {
+  @apply dark:bg-gray-800 bg-gray-50 shadow-md dark:text-white text-gray-900 !important
+}
+
+.sweetalert-confirm-btn {
+  @apply bg-red-500 !important
+}
+
 @media (min-width: 768px) {
   /* width */
   ::-webkit-scrollbar {

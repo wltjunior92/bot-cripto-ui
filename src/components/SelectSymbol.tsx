@@ -1,6 +1,5 @@
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Label } from 'flowbite-react'
 import Select, { Props as ReactSelectLibProps } from 'react-select'
 
 import { useEnums } from '../hooks/useEnums'
@@ -62,15 +61,16 @@ export const SelectSymbol = forwardRef<any, SelectSymbolProps>(
       () => (
         <div className="flex flex-col">
           {!!label && (
-            <Label
+            <label
               htmlFor={id}
-              value={label}
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            />
+              className="text-gray-900 dark:text-white font-semibold mb-2"
+            >
+              {label}
+            </label>
           )}
           <div className="flex flex-row items-center">
             <button
-              className="flex items-center justify-center bg-amber-700 disabled:bg-amber-800 disabled:hover:bg-amber-800 hover:bg-amber-800 dark:bg-amber-600 disabled:dark:bg-gray-500 disabled:hover:dark:bg-gray-500 dark:hover:bg-amber-700 h-10 w-12 rounded-l-lg"
+              className="flex items-center justify-center bg-amber-700 disabled:bg-gray-500 disabled:hover:bg-gray-500 hover:bg-amber-800 dark:bg-amber-600 disabled:dark:bg-gray-500 disabled:hover:dark:bg-gray-500 dark:hover:bg-amber-700 h-10 w-12 rounded-l-lg"
               onClick={() => {
                 setOnlyFavorites(!onlyFavorites)
               }}

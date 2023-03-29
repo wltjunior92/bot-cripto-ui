@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, Controller } from 'react-hook-form'
 import { RiAlertFill } from 'react-icons/ri'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import * as zod from 'zod'
 
 import { Breadcumb } from '../components/Breadcumb'
@@ -21,15 +21,27 @@ import { useAuth } from '../hooks/useAuth'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useWallet } from '../hooks/useWallet'
 import { ReactSelectProps } from '../interfaces/ReactSelectProps'
-import { postOrderService } from '../services/OrdersService'
+import {
+  cancelOrder,
+  getOrder,
+  postOrderService,
+} from '../services/OrdersService'
 import { getSymbol } from '../services/SymbolsService'
 import { JWT_TOKEN_KEY_NAME, STOP_TYPES } from '../utils/constants'
+import { confirmAction } from '../utils/modals'
 import { requestNotificationHandler } from '../utils/requestNotificationHandler'
-import { newOrderFormValidationSchema } from '../utils/schemaValidations'
+import { addOrViewOrderFormValidationSchema } from '../utils/schemaValidations'
 
-export type NewOrderFormData = zod.infer<typeof newOrderFormValidationSchema>
+export type AddOrViewOrderFormData = zod.infer<
+  typeof addOrViewOrderFormValidationSchema
+>
 
-const DEFAULT_VALUES: NewOrderFormData = {
+type FormType = AddOrViewOrderFormData & {
+  order_status?: string
+  order_id?: string
+}
+
+const DEFAULT_VALUES: FormType = {
   symbol: null,
   order_type: 'NONE',
   order_side: 'BUY',
@@ -55,19 +67,22 @@ const breadcumbNav = [
   },
 ]
 
-export default function NewOrder() {
+export default function AddOrViewOrder() {
   const [selectedSymbol, setSelectedSymbol] = useState<SymbolDTO>()
   const [orderSide, setOrderSide] = useState<'BUY' | 'SELL'>('BUY')
   const [orderTotal, setOrderTotal] = useState('0')
   const [exchangeError, setExchangeError] = useState('')
+
   // eslint-disable-next-line no-unused-vars
-  const [order, setOrder] = useState<NewOrderFormData>(DEFAULT_VALUES)
+  const [order, setOrder] = useState<FormType>(DEFAULT_VALUES)
 
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
   const { setIsLoggedInAction } = useAuth()
   const { wallet } = useWallet()
 
   const navigate = useNavigate()
+
+  const { id: orderId } = useParams()
 
   const {
     register,
@@ -76,19 +91,21 @@ export default function NewOrder() {
     watch,
     setValue,
     setError,
-    formState: { errors },
-  } = useForm<NewOrderFormData>({
-    resolver: zodResolver(newOrderFormValidationSchema),
-    defaultValues: {
-      symbol: order.symbol,
-      order_type: order.order_type,
-      limit_price: order.limit_price,
-      quantity: order.quantity,
-      options: {
-        iceberg_quantity: order.options.iceberg_quantity,
-        stop_price: order.options.stop_price,
-      },
-    },
+    formState: { errors, isSubmitting },
+  } = useForm<AddOrViewOrderFormData>({
+    resolver: zodResolver(addOrViewOrderFormValidationSchema),
+    defaultValues: useMemo(() => {
+      return {
+        symbol: order.symbol,
+        order_type: order.order_type,
+        limit_price: order.limit_price,
+        quantity: order.quantity,
+        options: {
+          iceberg_quantity: order.options.iceberg_quantity,
+          stop_price: order.options.stop_price,
+        },
+      }
+    }, [order]),
   })
 
   const symbol = watch('symbol')
@@ -97,7 +114,7 @@ export default function NewOrder() {
   const orderQuantity = watch('quantity')
   const orderIcebergQty = watch('options.iceberg_quantity')
 
-  async function handleSubmitForm(data: NewOrderFormData) {
+  async function handleSubmitForm(data: AddOrViewOrderFormData) {
     const result = await postOrderService(data, orderSide, token)
 
     if (!result.success) {
@@ -105,7 +122,7 @@ export default function NewOrder() {
     }
 
     requestNotificationHandler(result)
-    navigate('/dashboard')
+    navigate('/orders')
   }
 
   function onPriceChange(book: Book) {
@@ -125,6 +142,22 @@ export default function NewOrder() {
           `O valor total da ordem deve ser maior ou igual a ${selectedSymbol?.min_notional}`,
         )
       }
+    }
+  }
+
+  async function onCancelOrder(symbol: string, orderId: string) {
+    const isConfirmed = await confirmAction(
+      'Tem certeza que deseja cancelar a ordem?',
+    )
+    if (isConfirmed) {
+      const result = await cancelOrder(symbol, orderId, token)
+
+      if (!result.success) {
+        return requestNotificationHandler(result)
+      }
+
+      requestNotificationHandler(result)
+      navigate('/orders')
     }
   }
 
@@ -195,12 +228,44 @@ export default function NewOrder() {
     }
   }, [orderType])
 
+  useEffect(() => {
+    if (orderId) {
+      breadcumbNav[breadcumbNav.length - 1] = {
+        label: 'Detelhes',
+      }
+      getOrder(orderId, token)
+        .then((result) => {
+          if (!result.success) {
+            requestNotificationHandler(result)
+          }
+
+          setOrder(result.data)
+          setValue('symbol', result.data.symbol)
+          setValue('quantity', result.data.quantity)
+          setValue('order_side', result.data.order_side)
+          setValue('order_type', result.data.order_type)
+          setValue('limit_price', result.data.limit_price)
+          setValue(
+            'options.iceberg_quantity',
+            result.data.options.iceberg_quantity,
+          )
+          setValue('options.stop_price', result.data.options.stop_price)
+          console.log(order.order_id)
+        })
+        .catch((error) => console.log(error))
+    } else {
+      breadcumbNav[breadcumbNav.length - 1] = {
+        label: 'Nova',
+      }
+    }
+  }, [])
+
   return (
     <main className="p-4 sm:ml-64 bg-gray-100 dark:bg-gray-900">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4 mt-14">
         <div className="col-span-1 md:col-span-12 mt-4">
           <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-            Nova Ordem
+            {orderId ? 'Detalhes' : 'Nova Ordem'}
           </h1>
         </div>
         <div className="grid grid-cols-6 md:grid-cols-12 col-span-1 md:col-span-12 mt-4">
@@ -220,6 +285,7 @@ export default function NewOrder() {
                   ref={ref}
                   id="symbol"
                   error={errors.symbol as any}
+                  disabled={!!orderId}
                   onChange={(e) => {
                     const event = e as ReactSelectProps
                     onChange(event.value)
@@ -231,9 +297,11 @@ export default function NewOrder() {
               rules={{ required: true }}
             />
           </div>
-          <div className="col-span-12 md:col-span-6">
-            <SymbolPrice symbol={symbol} onPriceChange={onPriceChange} />
-          </div>
+          {(!orderId || order.order_status === 'NEW') && (
+            <div className="col-span-12 md:col-span-6">
+              <SymbolPrice symbol={symbol} onPriceChange={onPriceChange} />
+            </div>
+          )}
           <div className="col-span-12 md:col-span-6 grid grid-cols-2 gap-x-2">
             <WalletSummary symbol={selectedSymbol} showLabel wallet={wallet} />
           </div>
@@ -241,12 +309,14 @@ export default function NewOrder() {
             <SelectSide
               orderSide={orderSide}
               onAction={(value) => setOrderSide(value)}
+              isDisabled={!!orderId}
             />
           </div>
           <div className="col-span-12 md:col-span-6">
             <Select
               id="type"
               label="Tipo de ordem:"
+              disabled={!!orderId}
               error={errors.order_type as any}
               {...register('order_type')}
             >
@@ -265,9 +335,11 @@ export default function NewOrder() {
               id="limit_price"
               label="Preço por unidade:"
               type="number"
+              step="any"
+              min={0}
               error={errors.limit_price as any}
               placeholder={orderType === 'MARKET' ? 'Operação a mercado' : '0'}
-              disabled={orderType === 'MARKET'}
+              disabled={orderType === 'MARKET' || !!orderId}
               {...register('limit_price')}
             />
           </div>
@@ -277,8 +349,11 @@ export default function NewOrder() {
                 id="options.stop_price"
                 label="Preço stop:"
                 placeholder="0"
-                error={errors.options && (errors.options.stop_price as any)}
                 type="number"
+                step="any"
+                min={0}
+                disabled={!!orderId}
+                error={errors.options && (errors.options.stop_price as any)}
                 {...register('options.stop_price')}
               />
             </div>
@@ -287,6 +362,7 @@ export default function NewOrder() {
             <QuantityInput
               id="quantity"
               label="Quantidade:"
+              disabled={!!orderId}
               onCalc={(value) => setValue('quantity', value)}
               side={orderSide}
               wallet={wallet}
@@ -301,6 +377,7 @@ export default function NewOrder() {
               <QuantityInput
                 id="options.iceberg_quantity"
                 label="Quantidade Iceberg:"
+                disabled={!!orderId}
                 onCalc={(value) => setValue('options.iceberg_quantity', value)}
                 side={orderSide}
                 error={
@@ -321,9 +398,19 @@ export default function NewOrder() {
               disabled
             />
           </div>
+          {!!orderId && (
+            <>
+              <div className="col-span-12">
+                <h1 className="text-md font-bold leading-tight tracking-tight text-gray-900 md:text-lg dark:text-white mt-8">
+                  Outras informações
+                </h1>
+              </div>
+              <div className="col-span-12 md:col-span-6"></div>
+            </>
+          )}
           <div className="col-span-12 mt-6">
             <div className="flex flex-col md:flex-row">
-              {exchangeError && (
+              {exchangeError && !!orderId && (
                 <FeedbackAlert
                   className="max-w-full"
                   message={exchangeError}
@@ -334,9 +421,78 @@ export default function NewOrder() {
                 />
               )}
               <div className="w-full md:w-2/12 ml-auto mt-4 md:mt-0">
-                <Button type="submit" disabled={!!exchangeError}>
-                  Enviar ordem
-                </Button>
+                {!orderId ? (
+                  <Button
+                    type="submit"
+                    disabled={!!exchangeError || isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <div className="flex flex-row items-center justify-center">
+                        <div role="status">
+                          <svg
+                            aria-hidden="true"
+                            className="inline w-4 h-4 mr-2 text-gray-200 bg-transparent animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300"
+                            viewBox="0 0 100 101"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                              fill="currentColor"
+                            />
+                            <path
+                              d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                              fill="currentFill"
+                            />
+                          </svg>
+                          <span className="sr-only">Loading...</span>
+                        </div>
+                        Enviando...
+                      </div>
+                    ) : (
+                      <>Enviar Ordem</>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    disabled={order.order_status !== 'NEW'}
+                    variant="danger"
+                    onClick={() =>
+                      onCancelOrder(
+                        order.symbol as string,
+                        order.order_id as string,
+                      )
+                    }
+                  >
+                    {isSubmitting ? (
+                      <div className="flex flex-row items-center justify-center">
+                        <div role="status">
+                          <svg
+                            aria-hidden="true"
+                            className="inline w-4 h-4 mr-2 text-gray-200 bg-transparent animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300"
+                            viewBox="0 0 100 101"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                              fill="currentColor"
+                            />
+                            <path
+                              d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                              fill="currentFill"
+                            />
+                          </svg>
+                          <span className="sr-only">Loading...</span>
+                        </div>
+                        Cancelando...
+                      </div>
+                    ) : (
+                      <>Cancelar Ordem</>
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

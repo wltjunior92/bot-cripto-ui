@@ -2,14 +2,14 @@ import axios, { AxiosErrorDefault } from 'axios'
 
 import { OrderDTO } from '../dtos/orderDTO'
 import { env } from '../env'
-import { NewOrderFormData } from '../pages/NewOrder'
+import { AddOrViewOrderFormData } from '../pages/AddOrViewOrder'
 import { STOP_TYPES } from '../utils/constants'
 import { RequestNotificationHandlerProps } from '../utils/requestNotificationHandler'
 
 const API_URL = env.VITE_APP_API
 
 export async function postOrderService(
-  values: NewOrderFormData,
+  values: AddOrViewOrderFormData,
   orderSide: 'BUY' | 'SELL',
   token: string,
 ) {
@@ -71,6 +71,72 @@ export async function getOrders(symbol: string, token: string, page?: number) {
 
     return {
       data,
+      success: true,
+    }
+  } catch (error) {
+    const err = error as AxiosErrorDefault
+    return {
+      success: false,
+      message: 'Não foi possível listar as ordens.',
+      errorCode: err.response?.status,
+    } as RequestNotificationHandlerProps
+  }
+}
+
+export async function cancelOrder(
+  symbol: string,
+  orderId: string,
+  token: string,
+) {
+  try {
+    const { data } = await axios.delete(
+      `${API_URL}/orders/${symbol}/${orderId}`,
+      {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      },
+    )
+
+    return {
+      data,
+      success: true,
+      message: 'Ordem cancelada com sucesso.',
+    }
+  } catch (error) {
+    const err = error as AxiosErrorDefault
+    return {
+      success: false,
+      message: 'Não foi cancelar a ordem.',
+      errorCode: err.response?.status,
+    } as RequestNotificationHandlerProps
+  }
+}
+
+export async function getOrder(orderId: string, token: string) {
+  try {
+    const { data } = await axios.get(`${API_URL}/orders/findById/${orderId}`, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    })
+
+    const order: OrderDTO = {
+      symbol: data.order.symbol,
+      order_side: data.order.order_side,
+      order_type: data.order.order_type,
+      quantity: data.order.quantity,
+      limit_price: data.order.limit_price || '',
+      options: {
+        iceberg_quantity: data.order.iceberg_quantity || '',
+        stop_price: data.order.stop_price || '',
+      },
+      order_id: data.order.order_id,
+      order_status: data.order.order_status,
+    }
+
+    return {
+      data: order,
       success: true,
     }
   } catch (error) {

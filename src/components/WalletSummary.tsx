@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { SymbolDTO } from '../dtos/userDTO'
 import { WalletProp } from '../hooks/useWallet'
 
@@ -34,26 +32,21 @@ export function WalletSummary({
     return `${symbol.quote_asset}: ${quoteAsset.available.substring(0, 8)}`
   }
 
-  const walletSummary = useMemo(
-    () => (
-      <>
-        {showLabel && (
-          <div className="col-span-2 flex mr-4 mb-2">
-            <span className="text-gray-900 dark:text-white font-semibold">
-              Carteira:
-            </span>
-          </div>
-        )}
-        <div className="border dark:border-gray-500 rounded-lg p-2 shadow-md bg-white dark:bg-gray-600">
-          <span className="text-gray-900 dark:text-gray-100">{`${getBaseAsset()}`}</span>
+  return (
+    <>
+      {showLabel && (
+        <div className="col-span-2 flex mr-4 mb-2">
+          <span className="text-gray-900 dark:text-white font-semibold">
+            Carteira:
+          </span>
         </div>
-        <div className="border dark:border-gray-500 rounded-lg p-2 shadow-md bg-white dark:bg-gray-600">
-          <span className="text-gray-900 dark:text-gray-100">{`${getQuoteAsset()}`}</span>
-        </div>
-      </>
-    ),
-    [symbol],
+      )}
+      <div className="border dark:border-gray-500 rounded-lg p-1.5 shadow-md bg-white dark:bg-gray-600">
+        <span className="text-gray-900 dark:text-gray-100">{`${getBaseAsset()}`}</span>
+      </div>
+      <div className="border dark:border-gray-500 rounded-lg p-1.5 shadow-md bg-white dark:bg-gray-600">
+        <span className="text-gray-900 dark:text-gray-100">{`${getQuoteAsset()}`}</span>
+      </div>
+    </>
   )
-
-  return walletSummary
 }

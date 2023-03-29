@@ -1,7 +1,5 @@
 import { forwardRef, HTMLProps } from 'react'
 
-import { Label } from 'flowbite-react'
-
 import { SymbolDTO } from '../dtos/userDTO'
 import { WalletProp } from '../hooks/useWallet'
 
@@ -56,20 +54,22 @@ export const QuantityInput = forwardRef<HTMLInputElement, QuantityInputProps>(
     }
 
     return (
-      <>
+      <div className="flex flex-col">
         {!!label && (
-          <Label
+          <label
             htmlFor={id}
-            value={label}
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-          />
+            className="text-gray-900 dark:text-white font-semibold mb-2"
+          >
+            {label}
+          </label>
         )}
         <div className="flex flex-row items-center">
           <div className="rounded-l-lg overflow-hidden border border-gray-300 dark:border-gray-600 border-r-0">
             <button
-              className="flex items-center justify-center bg-amber-700 disabled:bg-amber-800 disabled:hover:bg-amber-800 hover:bg-amber-800 dark:bg-amber-600 disabled:dark:bg-gray-500 disabled:hover:dark:bg-gray-500 dark:hover:bg-amber-700 h-10 w-12"
+              className="flex items-center justify-center bg-amber-700 disabled:bg-gray-500 disabled:hover:bg-gray-500 hover:bg-amber-800 dark:bg-amber-600 disabled:dark:bg-gray-500 disabled:hover:dark:bg-gray-500 dark:hover:bg-amber-700 h-10 w-12"
               type="button"
               onClick={handleCalcQuantity}
+              disabled={rest.disabled}
               tabIndex={-1}
             >
               <svg
@@ -89,6 +89,9 @@ export const QuantityInput = forwardRef<HTMLInputElement, QuantityInputProps>(
           <input
             className="shadow-sm  border border-gray-300 dark:border-gray-600 bg-gray-50  text-gray-900 disabled:text-gray-700 dark:disabled:text-gray-400 text-sm rounded-r-lg block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400 dark:text-gray-50 dark:focus:ring-blue-500"
             placeholder={getPlaceholder()}
+            type="number"
+            step="any"
+            min={0}
             ref={ref}
             id={id}
             {...rest}
@@ -99,7 +102,7 @@ export const QuantityInput = forwardRef<HTMLInputElement, QuantityInputProps>(
             {error?.message}
           </span>
         )}
-      </>
+      </div>
     )
   },
 )

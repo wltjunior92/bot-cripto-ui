@@ -7,9 +7,11 @@ import { NewOrderButton } from '../components/NewOrderButton'
 import { OrderRow } from '../components/OrderRow'
 import { Pagination } from '../components/Pagination'
 import { SearchField } from '../components/SearchField'
+import { TableSkeleton } from '../components/TableSkeleton'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { getOrders } from '../services/OrdersService'
+import { cancelOrder, getOrders } from '../services/OrdersService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
+import { confirmAction } from '../utils/modals'
 import { requestNotificationHandler } from '../utils/requestNotificationHandler'
 
 const breadcumbNav = [
@@ -23,6 +25,7 @@ const breadcumbNav = [
 ]
 
 export default function Orders() {
+  const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [orders, setOrders] = useState<any[]>([])
   const [page, setPage] = useState(1)
@@ -39,18 +42,42 @@ export default function Orders() {
     setSearch(search)
   }, 650)
 
-  async function fetchOrders() {
-    const result = await getOrders(search, token, page)
+  async function onCancelOrder(symbol: string, orderId: string) {
+    const isConfirmed = await confirmAction(
+      'Tem certeza que deseja cancelar a ordem?',
+    )
+    if (isConfirmed) {
+      const result = await cancelOrder(symbol, orderId, token)
 
-    if (!result.success) {
-      return requestNotificationHandler(result)
+      if (!result.success) {
+        requestNotificationHandler(result)
+      }
+
+      console.log(result.data)
+      const orderIndex = orders.findIndex((o) => o.id === result.data.id)
+      const copyList = [...orders]
+      copyList[orderIndex] = result.data
+      setOrders(copyList)
     }
+  }
 
-    Promise.all([
-      setOrders(result.data.orders),
-      setTotal(result.data.count),
-      setOrdersPerPage(result.data.page_qty),
-    ])
+  async function fetchOrders() {
+    setIsLoading(true)
+    try {
+      const result = await getOrders(search, token, page)
+
+      if (!result.success) {
+        return requestNotificationHandler(result)
+      }
+
+      Promise.all([
+        setOrders(result.data.orders),
+        setTotal(result.data.count),
+        setOrdersPerPage(result.data.page_qty),
+      ])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -108,12 +135,18 @@ export default function Orders() {
                 </tr>
               </thead>
               <tbody>
-                {orders.length > 0 &&
+                {!isLoading &&
+                  orders.length > 0 &&
                   orders.map((item: any) => (
-                    <OrderRow key={item.id} data={item} />
+                    <OrderRow
+                      key={item.id}
+                      data={item}
+                      onCancel={onCancelOrder}
+                    />
                   ))}
               </tbody>
             </table>
+            {isLoading && <TableSkeleton />}
           </div>
           <Pagination
             page={page}
