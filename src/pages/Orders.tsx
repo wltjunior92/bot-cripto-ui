@@ -46,14 +46,16 @@ export default function Orders() {
       return requestNotificationHandler(result)
     }
 
-    setOrders(result.data.orders)
-    setTotal(result.data.count)
-    setOrdersPerPage(result.data.page_qty)
+    Promise.all([
+      setOrders(result.data.orders),
+      setTotal(result.data.count),
+      setOrdersPerPage(result.data.page_qty),
+    ])
   }
 
   useEffect(() => {
     fetchOrders()
-  }, [search])
+  }, [search, page])
 
   return (
     <main className="p-4 sm:ml-64 bg-gray-100 dark:bg-gray-900">
@@ -113,7 +115,12 @@ export default function Orders() {
               </tbody>
             </table>
           </div>
-          <Pagination page={page} itensByPage={ordersPerPage} total={total} />
+          <Pagination
+            page={page}
+            itensByPage={ordersPerPage}
+            total={total}
+            onNavigate={(value) => setPage(value)}
+          />
         </div>
       </div>
     </main>
