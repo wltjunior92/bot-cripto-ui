@@ -1,5 +1,6 @@
-import { Label } from 'flowbite-react'
 import { forwardRef, HTMLProps } from 'react'
+
+import { Label } from 'flowbite-react'
 
 type InputProps = HTMLProps<HTMLInputElement> & {
   id: string

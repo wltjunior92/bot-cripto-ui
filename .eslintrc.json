@@ -2,6 +2,7 @@
   "extends": "@rocketseat/eslint-config/react",
   "rules": {
     "react-hooks/exhaustive-deps": ["off"],
+    "camelcase": "off",
     "import/order": [
       "warn",
       {

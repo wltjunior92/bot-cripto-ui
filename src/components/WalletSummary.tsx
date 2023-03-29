@@ -1,19 +1,19 @@
 import { useMemo } from 'react'
 
 import { SymbolDTO } from '../dtos/userDTO'
-import { useWallet } from '../hooks/useWallet'
+import { WalletProp } from '../hooks/useWallet'
 
 type WalletSummaryProps = {
-  symbol: SymbolDTO
+  symbol: SymbolDTO | undefined
   showLabel?: boolean
+  wallet: WalletProp[]
 }
 
 export function WalletSummary({
   symbol,
   showLabel = false,
+  wallet,
 }: WalletSummaryProps) {
-  const { wallet } = useWallet()
-
   function getBaseAsset() {
     if (!wallet) return 0
     if (!symbol) return 0
@@ -37,11 +37,13 @@ export function WalletSummary({
   const walletSummary = useMemo(
     () => (
       <>
-        <div className="col-span-2 flex mr-4 mb-1">
-          <span className="text-gray-900 dark:text-white font-bold">
-            Carteira:
-          </span>
-        </div>
+        {showLabel && (
+          <div className="col-span-2 flex mr-4 mb-2">
+            <span className="text-gray-900 dark:text-white font-semibold">
+              Carteira:
+            </span>
+          </div>
+        )}
         <div className="border dark:border-gray-500 rounded-lg p-2 shadow-md bg-white dark:bg-gray-600">
           <span className="text-gray-900 dark:text-gray-100">{`${getBaseAsset()}`}</span>
         </div>

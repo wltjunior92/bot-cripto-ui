@@ -11,7 +11,7 @@ import { getBalance } from '../services/ExchangeService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 import { requestNotificationHandler } from '../utils/requestNotificationHandler'
 
-type WalletProp = {
+export type WalletProp = {
   symbol: string
   available: string
   onOrder: string

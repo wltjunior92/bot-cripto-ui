@@ -5,11 +5,14 @@ import useWebSocket from 'react-use-websocket'
 import { env } from '../env'
 import { JsonMessageProps } from '../interfaces/JsonMessageProps'
 
+export type Book = { bid: string; ask: string }
+
 type SymbolPriceProps = {
-  symbol?: string
+  symbol?: string | null
+  onPriceChange?: (book: Book) => void
 }
 
-export function SymbolPrice({ symbol }: SymbolPriceProps) {
+export function SymbolPrice({ symbol, onPriceChange }: SymbolPriceProps) {
   const [book, setBook] = useState({ bid: '0', ask: '0' })
 
   function getBinanceWSUrl() {
@@ -32,7 +35,11 @@ export function SymbolPrice({ symbol }: SymbolPriceProps) {
       if (!symbol) return
       const jsonMessage = lastJsonMessage as JsonMessageProps | null
       if (jsonMessage) {
-        setBook({ bid: jsonMessage.b, ask: jsonMessage.a })
+        const book = { bid: jsonMessage.b, ask: jsonMessage.a }
+        setBook(book)
+        if (onPriceChange) {
+          onPriceChange(book)
+        }
       }
     },
     onError: (event) => {
@@ -48,7 +55,7 @@ export function SymbolPrice({ symbol }: SymbolPriceProps) {
 
   return (
     <div className="ml-auto w-full md:w-fit">
-      <div className="flex mr-4 mb-1">
+      <div className="flex mr-4 mb-2">
         <span className="text-gray-900 dark:text-white text-xs">
           Spread {symbol || '-------'}:
         </span>
@@ -58,7 +65,7 @@ export function SymbolPrice({ symbol }: SymbolPriceProps) {
           <div className="bg-red-800 px-2 w-11">
             <span className="text-white font-mono">BID</span>
           </div>
-          <div className="px-2">
+          <div className="px-2 w-full text-right">
             <span className="text-gray-100 font-mono">
               {`${book.bid || '0'}`.substring(0, 9)}
             </span>
@@ -68,7 +75,7 @@ export function SymbolPrice({ symbol }: SymbolPriceProps) {
           <div className="bg-green-800 px-2 w-11">
             <span className="text-white font-mono">ASK</span>
           </div>
-          <div className="px-2">
+          <div className="px-2 w-full text-right">
             <span className="text-gray-100 font-mono">
               {`${book.ask || '0'}`.substring(0, 9)}
             </span>

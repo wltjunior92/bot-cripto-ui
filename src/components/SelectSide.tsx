@@ -2,15 +2,15 @@ import { useMemo } from 'react'
 
 type SelectSideProps = {
   orderSide: string
-  onAction: (value: 'buy' | 'sell') => void
+  onAction: (value: 'BUY' | 'SELL') => void
 }
 
 export function SelectSide({ orderSide, onAction }: SelectSideProps) {
   const selectSide = useMemo(
     () => (
       <>
-        <div className="col-span-2 flex mr-4 mb-1">
-          <span className="text-gray-900 dark:text-white font-bold">
+        <div className="col-span-2 flex mr-4 mb-2">
+          <span className="text-gray-900 dark:text-white font-semibold">
             Lado da operação:
           </span>
         </div>
@@ -28,7 +28,7 @@ export function SelectSide({ orderSide, onAction }: SelectSideProps) {
                   border-r-0
                   rounded-l-lg
                   ${
-                    orderSide === 'buy'
+                    orderSide === 'BUY'
                       ? `
                   hover:bg-emerald-700
                   border-gray-300
@@ -51,7 +51,7 @@ export function SelectSide({ orderSide, onAction }: SelectSideProps) {
                   dark:hover:bg-gray-600`
                   }
                   `}
-          onClick={() => onAction('buy')}
+          onClick={() => onAction('BUY')}
         >
           Comprar
         </button>
@@ -68,7 +68,7 @@ export function SelectSide({ orderSide, onAction }: SelectSideProps) {
                   border
                   rounded-r-lg
                   ${
-                    orderSide === 'sell'
+                    orderSide === 'SELL'
                       ? `
                   hover:bg-red-700
                   border-gray-300
@@ -91,7 +91,7 @@ export function SelectSide({ orderSide, onAction }: SelectSideProps) {
                   dark:hover:bg-gray-600`
                   }
               `}
-          onClick={() => onAction('sell')}
+          onClick={() => onAction('SELL')}
         >
           Vender
         </button>

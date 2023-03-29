@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as zod from 'zod'
 
+import { Breadcumb } from '../components/Breadcumb'
 import { Button } from '../components/Button'
 import { Input } from '../components/Input'
 import { Symbols } from '../components/Symbols'
@@ -14,6 +15,16 @@ import { updateUserData } from '../services/UserDataService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 import { requestNotificationHandler } from '../utils/requestNotificationHandler'
 import { settingsFormValidationSchema } from '../utils/schemaValidations'
+
+const breadcumbNav = [
+  {
+    label: 'Home',
+    link: '/dashboard',
+  },
+  {
+    label: 'Configurações',
+  },
+]
 
 type SettingsFormData = zod.infer<typeof settingsFormValidationSchema>
 
@@ -73,6 +84,9 @@ export default function Settings() {
           <h1 className="text-2xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
             Configurações
           </h1>
+        </div>
+        <div className="grid grid-cols-6 md:grid-cols-12 col-span-1 md:col-span-12 mt-4">
+          <Breadcumb itens={breadcumbNav} />
         </div>
         <form
           className="col-span-1 md:col-span-12 mt-4 w-full p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700"

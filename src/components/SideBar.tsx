@@ -1,6 +1,7 @@
-import { useNavBar } from '../hooks/useNavBar'
 import { FaChartPie, FaCogs, FaRobot, FaMoneyCheckAlt } from 'react-icons/fa'
+
 import { SidebarItem } from './SidebarItem'
+import { useNavBar } from '../hooks/useNavBar'
 
 export function SideBar() {
   const { isOpen } = useNavBar()

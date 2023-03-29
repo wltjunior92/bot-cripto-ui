@@ -50,7 +50,6 @@ export function EnumsDataProvider({ children }: EnumsDataContextProviderProps) {
   }
 
   useEffect(() => {
-    console.log(window.location.pathname)
     const path = window.location.pathname
     if (path !== '/') {
       setIsLoading(true)

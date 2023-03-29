@@ -26,6 +26,7 @@ export function CandleChart() {
         enable_publishing: false,
         allow_symbol_change: true,
         container_id: 'tradingview_1c4f4',
+        hide_side_toolbar: false,
         details: true,
         withdateranges: true,
       })

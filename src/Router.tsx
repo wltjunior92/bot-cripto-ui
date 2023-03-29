@@ -9,6 +9,7 @@ import { JWT_TOKEN_KEY_NAME } from './utils/constants'
 
 const Settings = lazy(() => import('./pages/Settings'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Orders = lazy(() => import('./pages/Orders'))
 const NewOrder = lazy(() => import('./pages/NewOrder'))
 
 export function Router() {
@@ -40,6 +41,16 @@ export function Router() {
             <ProtectedRoute>
               <Suspense fallback={<>...</>}>
                 <Dashboard />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<>...</>}>
+                <Orders />
               </Suspense>
             </ProtectedRoute>
           }

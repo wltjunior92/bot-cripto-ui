@@ -10,7 +10,7 @@ type SelectSymbolProps = ReactSelectLibProps & {
   id: string
   label?: string
   isOnlyFavorites?: boolean
-  value?: ReactSelectProps | null
+  value?: string | null
   disabled?: boolean
   error?:
     | {
@@ -21,7 +21,15 @@ type SelectSymbolProps = ReactSelectLibProps & {
 
 export const SelectSymbol = forwardRef<any, SelectSymbolProps>(
   function SelectSymbol(
-    { id, label, value, isOnlyFavorites = true, disabled = false, ...rest },
+    {
+      id,
+      label,
+      value,
+      isOnlyFavorites = true,
+      disabled = false,
+      error,
+      ...rest
+    },
     ref,
   ) {
     const [filteredSymbols, setFilteredSymbols] = useState<ReactSelectProps[]>(
@@ -68,6 +76,7 @@ export const SelectSymbol = forwardRef<any, SelectSymbolProps>(
               }}
               type="button"
               disabled={disabled}
+              tabIndex={-1}
             >
               <svg
                 stroke="currentColor"
@@ -95,7 +104,7 @@ export const SelectSymbol = forwardRef<any, SelectSymbolProps>(
               id={id}
               isSearchable
               placeholder="Selecione um Par"
-              value={value}
+              value={!value ? null : { value, label: value }}
               isDisabled={disabled}
               options={filteredSymbols}
               menuPortalTarget={document.body}
@@ -117,9 +126,14 @@ export const SelectSymbol = forwardRef<any, SelectSymbolProps>(
               {...rest}
             />
           </div>
+          {error?.message !== '' && (
+            <span className="text-xs font-medium text-red-500">
+              {error?.message}
+            </span>
+          )}
         </div>
       ),
-      [symbols, onlyFavorites, filteredSymbols, value, disabled],
+      [symbols, onlyFavorites, filteredSymbols, value, disabled, error],
     )
 
     return selectSymbol
