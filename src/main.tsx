@@ -11,16 +11,14 @@ import './global.css'
 import { Router } from './Router'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <ThemeContextProvider>
-      <AuthProvider>
-        <EnumsDataProvider>
-          <BrowserRouter>
-            <Toaster />
-            <Router />
-          </BrowserRouter>
-        </EnumsDataProvider>
-      </AuthProvider>
-    </ThemeContextProvider>
-  </React.StrictMode>,
+  <ThemeContextProvider>
+    <AuthProvider>
+      <EnumsDataProvider>
+        <BrowserRouter>
+          <Toaster />
+          <Router />
+        </BrowserRouter>
+      </EnumsDataProvider>
+    </AuthProvider>
+  </ThemeContextProvider>,
 )
