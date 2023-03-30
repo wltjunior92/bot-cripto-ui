@@ -1,14 +1,17 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
+
+import { debounce } from 'lodash'
 
 import { Button } from './Button'
 import { CheckboxInput } from './CheckboxInput'
 import { Pagination } from './Pagination'
+import { SearchField } from './SearchField'
 import { SymbolDTO } from '../dtos/userDTO'
 import { useAuth } from '../hooks/useAuth'
 import { useEnums } from '../hooks/useEnums'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import {
-  getSymbols,
+  searchSymbols,
   syncSymbols,
   updateFavoriteSymbol,
 } from '../services/SymbolsService'
@@ -20,20 +23,34 @@ export function Symbols() {
   const [isOnlyFavorites, setIsOnlyFavorites] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [symbols, setSymbols] = useState<SymbolDTO[]>([])
-  const [filteredSymbols, setFilteredSymbols] = useState<SymbolDTO[]>([])
+
+  const [page, setPage] = useState(1)
+  const [symbolsPerPage, setSymbolsPerPage] = useState(0)
+  const [total, setTotal] = useState(0)
+
   const [token] = useLocalStorage(JWT_TOKEN_KEY_NAME)
 
   const { setIsLoggedInAction } = useAuth()
   const { setSymbolsAction } = useEnums()
 
+  function handleTypeSearch(value: string) {
+    debouncedSearch(value)
+  }
+
+  const debouncedSearch = debounce((search) => {
+    setSearchTerm(search)
+  }, 650)
+
   async function fetchSymbols() {
-    const result = await getSymbols(token)
+    const result = await searchSymbols(searchTerm, isOnlyFavorites, page, token)
 
     if (!result.success) {
       return requestNotificationHandler(result, setIsLoggedInAction)
     }
 
-    setSymbols(result.data)
+    setSymbols(result.data.symbols)
+    setSymbolsPerPage(result.data.page_qty)
+    setTotal(result.data.count)
   }
 
   async function handleSyncSymbols() {
@@ -68,13 +85,6 @@ export function Symbols() {
     requestNotificationHandler(result)
   }
 
-  function handleSearch(e: FormEvent) {
-    e.preventDefault()
-    const eventTarget = e.target as any
-
-    setSearchTerm(eventTarget.simple_search.value)
-  }
-
   function handleFilterFavorites(e: ChangeEvent) {
     e.preventDefault()
     const eventTarget = e.target as any
@@ -86,28 +96,13 @@ export function Symbols() {
   useEffect(() => {
     if (!isSyncing) {
       fetchSymbols()
+      setPage(1)
     }
   }, [isSyncing])
 
   useEffect(() => {
-    if (searchTerm === '') {
-      setFilteredSymbols(symbols)
-    } else {
-      const filteredList = symbols.filter((s) =>
-        s.symbol.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
-      setFilteredSymbols(filteredList)
-    }
-  }, [searchTerm, symbols])
-
-  useEffect(() => {
-    if (!isOnlyFavorites) {
-      setFilteredSymbols(symbols)
-    } else {
-      const filteredList = symbols.filter((s) => s.is_favorite)
-      setFilteredSymbols(filteredList)
-    }
-  }, [isOnlyFavorites, symbols])
+    fetchSymbols()
+  }, [searchTerm, isOnlyFavorites, page])
 
   return (
     <div className="col-span-1 md:col-span-12 mt-4 w-full py-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -117,35 +112,7 @@ export function Symbols() {
       <div className="bg-white dark:bg-gray-800 relative shadow-sm overflow-hidden">
         <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
           <div className=" w-full md:w-1/2">
-            <form className="flex items-center" onSubmit={handleSearch}>
-              <label htmlFor="simple-search" className="sr-only">
-                Buscar
-              </label>
-              <div className="relative w-full">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <svg
-                    aria-hidden="true"
-                    className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  id="simple_search"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Buscar"
-                  required
-                />
-              </div>
-            </form>
+            <SearchField onChange={(value) => handleTypeSearch(value)} />
           </div>
           <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
             <CheckboxInput
@@ -191,8 +158,8 @@ export function Symbols() {
             </tr>
           </thead>
           <tbody>
-            {filteredSymbols.length > 0 &&
-              filteredSymbols.map((symbol) => (
+            {symbols.length > 0 &&
+              symbols.map((symbol) => (
                 <tr
                   key={symbol.symbol}
                   className="border-b dark:border-gray-700"
@@ -243,7 +210,12 @@ export function Symbols() {
           </tbody>
         </table>
       </div>
-      <Pagination />
+      <Pagination
+        page={page}
+        itensByPage={symbolsPerPage}
+        total={total}
+        onNavigate={(value) => setPage(value)}
+      />
     </div>
   )
 }

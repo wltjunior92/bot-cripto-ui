@@ -40,6 +40,8 @@ export function SelectSide({
                   hover:bg-emerald-700
                   border-gray-300
                   bg-emerald-600
+                  disabled:bg-emerald-600
+                  disabled:dark:bg-emerald-600
                   dark:bg-emerald-600
                   dark:border-gray-600
                   text-white
@@ -51,6 +53,8 @@ export function SelectSide({
                   border-gray-300
                   text-gray-900
                   bg-gray-200
+                  disabled:bg-gray-200
+                  disabled:dark:bg-gray-700
                   dark:bg-gray-700
                   dark:border-gray-600
                   dark:text-white
@@ -82,6 +86,8 @@ export function SelectSide({
                   hover:bg-red-700
                   border-gray-300
                   bg-red-600
+                  disabled:bg-red-600
+                  disabled:dark:bg-red-600
                   dark:bg-red-600
                   dark:border-gray-600
                   text-white
@@ -93,6 +99,8 @@ export function SelectSide({
                   border-gray-300
                   text-gray-900
                   bg-gray-200
+                  disabled:bg-gray-200
+                  disabled:dark:bg-gray-700
                   dark:bg-gray-700
                   dark:border-gray-600
                   dark:text-white

@@ -28,10 +28,42 @@ export async function getSymbols(token: string) {
   }
 }
 
+export async function searchSymbols(
+  search: string | undefined,
+  onlyFavorites: boolean | undefined,
+  page: number | undefined,
+  token: string,
+) {
+  try {
+    const url = `${API_URL}/symbol/search?${
+      search ? 'search=' + search + '&' : ''
+    }${onlyFavorites ? 'onlyFavorites=' + 'true&' : ''}${
+      page ? 'page=' + page + '&' : ''
+    }`
+    const { data } = await axios.get(url, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    })
+
+    return {
+      data,
+      success: true,
+    }
+  } catch (error) {
+    const err = error as AxiosErrorDefault
+    return {
+      success: false,
+      message: 'Não foi possível carregar os pares',
+      errorCode: err.response?.status,
+    } as RequestNotificationHandlerProps
+  }
+}
+
 export async function getSymbol(token: string, symbol: string) {
   try {
     if (!symbol) return { success: false }
-    const { data } = await axios.get(`${API_URL}/symbol/${symbol}`, {
+    const { data } = await axios.get(`${API_URL}/symbol/one/${symbol}`, {
       headers: {
         Authorization: 'Bearer ' + token,
       },

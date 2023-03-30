@@ -131,8 +131,19 @@ export async function getOrder(orderId: string, token: string) {
         iceberg_quantity: data.order.iceberg_quantity || '',
         stop_price: data.order.stop_price || '',
       },
-      order_id: data.order.order_id,
-      order_status: data.order.order_status,
+      order_id: data.order.order_id || '',
+      client_order_id: data.order.client_order_id || '',
+      order_status: data.order.order_status || '',
+      net: data.order.net || '',
+      avg_price: data.order.avg_price || '',
+      transact_time: data.order.transact_time
+        ? parseFloat(data.order.transact_time)
+        : 0,
+      is_maker: data.order.is_maker || '',
+      commission: data.order.commission || '',
+      obs: data.order.obs || '',
+      automation_id: data.order.automation_id || '',
+      id: data.order.id || '',
     }
 
     return {
@@ -144,6 +155,66 @@ export async function getOrder(orderId: string, token: string) {
     return {
       success: false,
       message: 'Não foi listar as ordens.',
+      errorCode: err.response?.status,
+    } as RequestNotificationHandlerProps
+  }
+}
+
+export async function syncOrder(id: string, full = false, token: string) {
+  try {
+    const { data } = await axios.post(
+      `${API_URL}/orders/sync/${id}`,
+      {},
+      {
+        headers: {
+          Authorization: 'Bearer ' + token,
+        },
+      },
+    )
+
+    if (full) {
+      return {
+        data,
+        success: true,
+        message: 'Ordem sincronizada.',
+      }
+    }
+
+    const order: OrderDTO = {
+      symbol: data.order.symbol,
+      order_side: data.order.order_side,
+      order_type: data.order.order_type,
+      quantity: data.order.quantity,
+      limit_price: data.order.limit_price || '',
+      options: {
+        iceberg_quantity: data.order.iceberg_quantity || '',
+        stop_price: data.order.stop_price || '',
+      },
+      order_id: data.order.order_id || '',
+      client_order_id: data.order.client_order_id || '',
+      order_status: data.order.order_status || '',
+      net: data.order.net || '',
+      avg_price: data.order.avg_price || '',
+      transact_time: data.order.transact_time
+        ? parseFloat(data.order.transact_time)
+        : 0,
+      is_maker: data.order.is_maker || '',
+      commission: data.order.commission || '',
+      obs: data.order.obs || '',
+      automation_id: data.order.automation_id || '',
+      id: data.order.id || '',
+    }
+
+    return {
+      data: order,
+      success: true,
+      message: 'Ordem sincronizada.',
+    }
+  } catch (error) {
+    const err = error as AxiosErrorDefault
+    return {
+      success: false,
+      message: 'Não foi possível sincronizar a ordem.',
       errorCode: err.response?.status,
     } as RequestNotificationHandlerProps
   }

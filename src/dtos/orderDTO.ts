@@ -10,5 +10,14 @@ export type OrderDTO = {
     order_type?: string
   }
   order_id?: string
+  client_order_id?: string
   order_status?: string
+  net?: string
+  avg_price?: string
+  transact_time?: number
+  is_maker?: boolean
+  commission?: string
+  obs?: string
+  automation_id?: string
+  id?: string
 }

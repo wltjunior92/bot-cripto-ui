@@ -9,7 +9,7 @@ import { Pagination } from '../components/Pagination'
 import { SearchField } from '../components/SearchField'
 import { TableSkeleton } from '../components/TableSkeleton'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { cancelOrder, getOrders } from '../services/OrdersService'
+import { cancelOrder, getOrders, syncOrder } from '../services/OrdersService'
 import { JWT_TOKEN_KEY_NAME } from '../utils/constants'
 import { confirmAction } from '../utils/modals'
 import { requestNotificationHandler } from '../utils/requestNotificationHandler'
@@ -28,6 +28,8 @@ export default function Orders() {
   const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [orders, setOrders] = useState<any[]>([])
+  const [isSynching, setIsSynching] = useState(false)
+
   const [page, setPage] = useState(1)
   const [ordersPerPage, setOrdersPerPage] = useState(0)
   const [total, setTotal] = useState(0)
@@ -53,12 +55,28 @@ export default function Orders() {
         requestNotificationHandler(result)
       }
 
-      console.log(result.data)
       const orderIndex = orders.findIndex((o) => o.id === result.data.id)
       const copyList = [...orders]
       copyList[orderIndex] = result.data
       setOrders(copyList)
     }
+  }
+
+  async function onSyncOrder(id: string) {
+    setIsSynching(true)
+    const result = await syncOrder(id, true, token)
+
+    if (!result.success) {
+      setIsSynching(false)
+      return requestNotificationHandler(result)
+    }
+
+    const orderIndex = orders.findIndex((o) => o.id === result.data.id)
+    const copyList = [...orders]
+    copyList[orderIndex] = result.data
+    setOrders(copyList)
+    requestNotificationHandler(result)
+    setIsSynching(false)
   }
 
   async function fetchOrders() {
@@ -142,6 +160,8 @@ export default function Orders() {
                       key={item.id}
                       data={item}
                       onCancel={onCancelOrder}
+                      onSync={onSyncOrder}
+                      isSynching={isSynching}
                     />
                   ))}
               </tbody>
