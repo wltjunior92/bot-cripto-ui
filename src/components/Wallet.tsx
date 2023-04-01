@@ -44,7 +44,11 @@ export function Wallet({ data }: WalletProps) {
   }
 
   useEffect(() => {
-    fetchBalance()
+    if (data && Object.entries(data).length) {
+      setBalance(data)
+    } else {
+      fetchBalance()
+    }
   }, [data])
 
   return (
