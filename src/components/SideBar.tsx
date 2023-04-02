@@ -1,4 +1,5 @@
 import { FaChartPie, FaCogs, FaRobot, FaMoneyCheckAlt } from 'react-icons/fa'
+import { TbDeviceAnalytics } from 'react-icons/tb'
 
 import { SidebarItem } from './SidebarItem'
 import { useNavBar } from '../hooks/useNavBar'
@@ -33,6 +34,14 @@ export function SideBar() {
             link="/automations"
           >
             Automações
+          </SidebarItem>
+          <SidebarItem
+            icon={
+              <TbDeviceAnalytics className="w-6 h-6 text-gray-300 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+            }
+            link="/monitors"
+          >
+            Monitores
           </SidebarItem>
           <SidebarItem
             icon={
